@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-import Game from './Components/Game/Game';
-import getGameQuery from './Query/getGameQuery';
+import GameCreate from './Components/Game/GameCreate'
+import GameList from './Components/Game/GameList';
+import gameMuCreate from './Query/gameMuCreate'
+import gameQuList from './Query/gameQuList';
+import OnCreateGameSubscription from './Query/gameSubOnCreate';
 import { graphql, compose } from 'react-apollo';
 
 class App extends Component {
@@ -14,23 +17,56 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <GameWithData />
+        <GameCreateWithData />
+        <GameListWithData />
       </div>
     );
   }
 }
 
-const GameWithData = compose(
-  graphql(getGameQuery, {
+const GameCreateWithData = compose(
+  graphql(gameMuCreate, {
+    props: (props) => ({
+      onCreate: (game) => {
+        props.mutate({
+          variables: { ...game },
+          optimisticResponse: () => ({ createGame: { ...game, __typename: 'Game' } })
+        })
+      }
+    }),
     options: {
-      variables: {id: '83648a91-8b36-4922-aeab-9361696de565'},
+      refetchQueries: [{ query: gameQuList }],
+      update: (dataProxy, { data: { createGame } }) => {
+        const query = gameQuList;
+        const data = dataProxy.readQuery({ query });
+        data.listGames.items = data.listGames.items.concat(createGame);
+        dataProxy.writeQuery({ query, data });
+      }
+    }
+  })
+)(GameCreate);
+
+const GameListWithData = compose(
+  graphql(gameQuList, {
+    options: {
       fetchPolicy: 'cache-and-network',
     },
-    props: (result) => ({
-      game: result.data.getGame
+    props: (props) => ({
+      data: props.data,
+      subscribeCreateGame: param => {
+        props.data.subscribeToMore({
+          document: OnCreateGameSubscription,
+          updateQuery: (prev, { subscriptionData: { data: { onCreateGame }}}) => ({
+            ...prev, listGames: {
+              ...prev.listGames,
+              items: [onCreateGame, ...prev.listGames.items.filter(p => p.id !== onCreateGame.id)]
+            }
+          })
+        })
+      }
     })
   })
-)(Game);
+)(GameList);
 
 
 export default App;
