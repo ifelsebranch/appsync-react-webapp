@@ -6,5 +6,13 @@ Example AWS AppSync React web app project for "How to AWS AppSync" Youtube serie
 - Episode's codes: https://github.com/IfElseBranch/appsync-react-webapp/releases
 
 ### EP2 Web app in makings
- - Video: https://www.youtube.com/watch?v=Lv6ssPACDug
+ - Video: https://youtu.be/Lv6ssPACDug
  - Code: https://github.com/IfElseBranch/appsync-react-webapp/tree/EP2
+
+### EP3 Web app in makings
+ - Video: https://youtu.be/of6bofr1rFk
+ - Code: https://github.com/IfElseBranch/appsync-react-webapp/tree/EP3
+
+### EP4 Deployed App Functioning
+ - Video: https://youtu.be/d1HIM2JqbgI
+ - Code: https://github.com/IfElseBranch/appsync-react-webapp/tree/EP4
